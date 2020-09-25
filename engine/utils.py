@@ -1,16 +1,26 @@
+# General imports
 import warnings
 warnings.filterwarnings("ignore")
+import numpy as np
 import pandas as pd
+import random
 
 # sklearn
 from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 
+from engine.vars import *
 # if separate df with all features is existent, set path
 # otherwise merge raw df with Features module
 
+TARGET = '취급액'
 
-def load_df(path=None):
+#########################
+## For Data Preprocessing
+#########################
+
+
+def load_df(path):
     """
     :objective: load data
     :return: pandas dataframe
@@ -59,6 +69,7 @@ def na_to_zeroes(df):
 
     return df
 
+
 ## Encoding
 # One-hot-Encoding
 def run_onehot(df):
@@ -81,6 +92,7 @@ def run_onehot(df):
 
 # Label Encoding
 
+
 def get_label_features(df):
     """
     :objective: Show features that need labelencoding
@@ -89,19 +101,6 @@ def get_label_features(df):
     lab_col = df.select_dtypes(include=['object','category']).columns.tolist()
 
     return lab_col
-
-
-def run_label_separately(df, colname):
-    """
-    :objective: Perform labelencoding for selected column(only one)
-    :return: pandas dataframe with encoding only on selected column
-    """
-    if type(colname) == str:
-        le = LabelEncoder()
-        df[colname] = le.fit_transform(df[colname].values)
-        return df
-    else:
-        print("Error! [colname] should be string type.")
 
 
 def get_label_mapping(le):
@@ -155,6 +154,7 @@ def remove_outliers(df_train):
 
     return df_train
 
+
 def run_preprocess(df):
     """
     :objective: Run Feature deletion, NA imputation, label encoding
@@ -166,3 +166,72 @@ def run_preprocess(df):
     df = run_label_all(df)
     df1 = df.copy()
     return df1
+
+
+#####################
+## For Model Training
+#####################
+
+# Seeder
+def seed_everything(seed=127):
+    random.seed(seed)
+    np.random.seed(seed)
+
+# metrics
+# negative mape (For Bayesian Optimization)
+def neg_mape(y_true, y_pred):
+    y_true, y_pred = np.array(y_true), np.array(y_pred)
+    mape = np.mean(np.abs((y_true - y_pred) / y_true)) * 100
+    result = (-1) * mape
+    return result
+
+# MAPE
+def get_mape(y_true, y_pred):
+    y_true, y_pred = np.array(y_true), np.array(y_pred)
+    final = np.mean(np.abs((y_true - y_pred) / y_true)) * 100
+    return final
+
+# RMSE
+def get_rmse(y_true, y_pred):
+    y_true, y_pred = np.array(y_true), np.array(y_pred)
+    rmse = np.sqrt(np.mean((y_true - y_pred) ** 2))
+    return rmse
+
+# MAE
+def get_mae(y_true, y_pred):
+    y_true, y_pred = np.array(y_true), np.array(y_pred)
+    mae = np.mean(np.abs(y_true - y_pred))
+    return mae
+
+## CV splits
+def cv_split(df, month, printprop=False):
+    split = int(df[df['months'] == month].index.values.max())
+    prop = str(split / df.shape[0])
+    if printprop:
+        print(f'Proportion of train set is {prop}')
+        return split
+    else:
+        return split
+
+## Divide into train/test
+def divide_train_val(df_pp, month, drop):
+    split = cv_split(df=df_pp, month=month)
+    train_x = df_pp.iloc[:split, :].drop(columns=['index',
+                                                  'show_id', TARGET] + drop)  ## 'index' check!!
+    train_y = df_pp.iloc[:split, :][TARGET]
+    val_x = df_pp.iloc[split:, :].drop(columns=['index',
+                                                'show_id', TARGET] + drop)
+    val_y = df_pp.iloc[split:, :][TARGET]
+    return train_x, train_y, val_x, val_y
+
+
+## Divide into high-rank / Low-rank (BY: mean_sales_origin)
+def divide_top(df, num_train, num_val):
+    top_df = df.sort_values('mean_sales_origin', ascending=False)
+
+    top_tr_lag_x = top_df.iloc[:num_train, :].drop(['index', 'show_id', TARGET], axis=1)
+    top_tr_lag_y = top_df.iloc[:num_train, :][TARGET]
+    top_v_lag_x = top_df.iloc[num_train:(num_train + num_val), :].drop(['index', 'show_id', TARGET], axis=1)
+    top_v_lag_y = top_df.iloc[num_train:(num_train + num_val), :][TARGET]
+
+    return top_df, top_tr_lag_x, top_tr_lag_y, top_v_lag_x, top_v_lag_y

@@ -22,7 +22,7 @@ class Features:
         self.counterfactual = counterfactual
         
         if self.type == 'hungarian':
-            df = pd.read_excel("../data/01/2020sales_opt_temp.xlsx")
+            df = pd.read_excel("../data/01/2020sales_hungarian_2level.xlsx")
         elif self.type == "hungarian_h1":
             df = pd.read_pickle("../data/20/hung1_firstwk.pkl")
         elif self.type == 'test':
@@ -1168,9 +1168,9 @@ class Features:
         :objective: drop na rows and 취급액 == 50000(train)
                     drop rows with 판매단가 == 0(test)
         """
-        if self.type == 'test':
+        if (self.type == 'test')|(self.type == 'hungarian'):
             self.train = self.train[self.train['판매단가'] != 0]
-        else:
+        elif self.type == 'train':
             self.train = self.train[self.train['취급액'].notna()]
             self.train = self.train[self.train['취급액'] != 50000]
 
@@ -1279,6 +1279,7 @@ class Features:
         return self.train
 
     def run_hungarian(self):
+        self.drop_na()
         self.get_time()
         self.get_weekday()
         self.get_hours_inweek()
@@ -1329,6 +1330,7 @@ class Features:
         self.get_ts_pred()
         print("finish getting get_ts_pred data")
         print(self.train.shape, ": df shape")
+
 
         return self.train
 

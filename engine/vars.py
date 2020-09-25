@@ -1,3 +1,10 @@
+# directories
+
+LOCAL_DIR = ".."
+MODELS_DIR = LOCAL_DIR + "/data/saved_models/"
+FEATURED_DATA_DIR = LOCAL_DIR + '/data/fin_data/'
+SUBMISSION_DIR = LOCAL_DIR + "/submission/"
+
 # set some Global Vars
 
 data_list = ['df_wk_lag', 'df_wk_no_lag', 'df_wd_lag', 'df_wd_no_lag', 'df_all_lag']
