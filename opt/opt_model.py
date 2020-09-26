@@ -11,18 +11,18 @@ from opt.inputs import *
 from munkres import Munkres
 
 
-####################################################################
-########################### Predict ################################
-####################################################################
+######################
+####### Predict ######
+######################
 
 lgbm_model_path = MODELS_DIR + 'lgbm_opt_mape_lr001_all.bin'
 estimator = pickle.load(open(lgbm_model_path, 'rb'))
 lgbm_preds_opt1 = estimator.predict(hung1_PP.drop(columns=['small_c', 'show_id', '상품코드']))
 lgbm_preds_opt2 = estimator.predict(hung2_PP.drop(columns=['small_c', 'show_id', '상품코드']))
 
-####################################################################
-########################### Hung1 ##################################
-####################################################################
+######################
+######## Model #######
+######################
 
 hung_mat = lgbm_preds_opt1.reshape((125, 125))  #rows: items, cols: time
 matrix = hung_mat
@@ -46,10 +46,12 @@ full_items_list = pd.read_excel("../data/20/tmp_hung_firstweek_items.xlsx")
 full_items_list.drop(columns=['Unnamed: 0', 'small_c_code', 'middle_c_code','big_c_code'], inplace=True)
 hung_out = full_items_list.copy()
 hung_out['방송일시'] = np.nan
+hung_out['predicted'] = np.nan
 for i in indexes:
     product = i[0]
     time = i[1]
     hung_out['방송일시'][product] = hung1_times[time]
+    hung_out['predicted'][product] = hung_mat[product, time]
 hung_out.drop(columns=['노출(분)'], inplace=True)
 hung_out.sort_values(['방송일시'], ascending=True, inplace=True)
 hung_out.set_index('방송일시', inplace=True)
@@ -69,6 +71,7 @@ h1_output = []
 h2_output = []
 cat = prod_list.상품군.unique()
 h2_total = 0
+
 
 for i in pd.date_range(start=datetime.datetime(2020, 6, 2, 1), end=datetime.datetime(2020, 7, 1, 1)):
 
@@ -140,10 +143,12 @@ for i in pd.date_range(start=datetime.datetime(2020, 6, 2, 1), end=datetime.date
         m = Munkres()
         indexes = m.compute(cost_matrix)
         total = 0
+        pred_value = []
         for row, column in indexes:
             value = matrix[row][column]
             total += value
             h2_total += value
+            pred_value += [value]
 
         code = []
         ct = []
@@ -151,7 +156,8 @@ for i in pd.date_range(start=datetime.datetime(2020, 6, 2, 1), end=datetime.date
             code.append((run_schd.상품코드.unique().tolist()[id2[1]]))
 
         prod_fin = pd.DataFrame({'방송일시': run_schd.방송일시.unique(),
-                                 '상품코드': code})
+                                 '상품코드': code,
+                                 'pred_value':pred_value})
 
         h2_output.append(prod_fin)
     h2_output_fin = pd.concat(h2_output)

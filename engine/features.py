@@ -13,13 +13,14 @@ import json
 
 
 class Features:
-    def __init__(self, types, counterfactual=False):
+    def __init__(self, types, counterfactual=False, not_divided = False):
         """
         :objective: load data and engineer features
         :param test: boolean  - whether to get test data. if false, we can work on raw train dataset(2019 sales)
         """
         self.type = types
         self.counterfactual = counterfactual
+        self.not_divided = not_divided
         
         if self.type == 'hungarian':
             df = pd.read_excel("../data/01/2020sales_hungarian_2level.xlsx")
@@ -760,7 +761,7 @@ class Features:
             # merge
             self.train.loc[self.train['show_id'] == curr_wk, 'lag_all_price_day'] = mean_price
 
-    def get_lag_sales(self, not_divided = False):
+    def get_lag_sales(self):
         """
         :objective: get sales lag 1,2 for weekend cases and lag 1 to 5 for weekday cases; pointwisely
         :return: pd.DataFrame - including lag_sales_wk_i (i = 1,2), lag_sales_wd_i (i = 1,2,3,4,5)
@@ -768,7 +769,7 @@ class Features:
         # use 2019-december data to get lag vars if self.type == 'test'
         if self.type != 'train':
             self.train['day_hour'] = self.train.days.astype(str) + '/' + self.train.hours.astype(str)
-            if not_divided:
+            if self.not_divided:
                 full_train = pd.read_pickle("../data/20/train_fin_light_ver.pkl")
                 lag_cols = ['day_hour','lag_sales_1', 'lag_sales_2',
                             'lag_sales_5', 'lag_sales_7']
@@ -835,7 +836,7 @@ class Features:
                 self.train.drop(['day_hour'], axis=1, inplace=True)
 
         else:
-            if not_divided:
+            if self.not_divided:
                 df_wkwd = self.train
                 for i in [1,2,5,7]:  # lags for 1,5 diff
                     temp_df = df_wkwd[['ymd', 'hours', '취급액']]
@@ -1269,7 +1270,7 @@ class Features:
         print(self.train.shape, ": df shape")
         #
         ### not dividedd
-        self.get_lag_sales(not_divided=False)
+        self.get_lag_sales()
         print("finish getting get_lag_sales data")
         print(self.train.shape, ": df shape")
         self.get_ts_pred()
@@ -1324,7 +1325,7 @@ class Features:
         print("finish getting get_mean_sales_origin data")
         print(self.train.shape, ": df shape")
 
-        self.get_lag_sales(not_divided=True)
+        self.get_lag_sales()
         print("finish getting get_lag_sales data")
         print(self.train.shape, ": df shape")
         self.get_ts_pred()
@@ -1335,7 +1336,7 @@ class Features:
         return self.train
 
 
-# t = Features(types = "train")
+# t = Features(types = "train", not_divided = False)
 # train = t.run_all()
 # train.to_pickle("../data/20/train_v2.pkl")
 # train.to_pickle("../data/20/train_fin_light_ver.pkl")

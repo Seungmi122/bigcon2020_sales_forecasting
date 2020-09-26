@@ -25,14 +25,14 @@ from engine.vars import *
 #   hung1 : hungarian input for no hierarchical model
 #   hung2 : hungarian input for hierarchical model
 
-t1 = Features(types="hungarian_h1")
+t1 = Features(types="hungarian_h1", not_divided=True)
 hung1 = t1.run_hungarian()
 hung1_times = hung1.iloc[:125]['방송일시']  # for output
 hung1_PP = run_preprocess(hung1)
 hung1_cols = hung1_PP.columns.to_list()  # check!
 
 
-t2 = Features(types="hungarian")
+t2 = Features(types="hungarian", not_divided=True)
 hung2 = t2.run_hungarian()
 # item list for hung2
 hung_list = hung2[['상품코드', '상품명']].drop_duplicates()
@@ -107,4 +107,3 @@ def run_hung_lgbm(train_x, train_y, val_x, val_y):
 
 if __name__ == "__main__":
     run_hung_lgbm(train_x, train_y, val_x, val_y)
-

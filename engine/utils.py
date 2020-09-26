@@ -179,6 +179,7 @@ def seed_everything(seed=127):
 
 # metrics
 # negative mape (For Bayesian Optimization)
+
 def neg_mape(y_true, y_pred):
     y_true, y_pred = np.array(y_true), np.array(y_pred)
     mape = np.mean(np.abs((y_true - y_pred) / y_true)) * 100
@@ -203,7 +204,7 @@ def get_mae(y_true, y_pred):
     mae = np.mean(np.abs(y_true - y_pred))
     return mae
 
-## CV splits
+# CV splits
 def cv_split(df, month, printprop=False):
     split = int(df[df['months'] == month].index.values.max())
     prop = str(split / df.shape[0])
@@ -213,7 +214,7 @@ def cv_split(df, month, printprop=False):
     else:
         return split
 
-## Divide into train/test
+# Divide into train/test
 def divide_train_val(df_pp, month, drop):
     split = cv_split(df=df_pp, month=month)
     train_x = df_pp.iloc[:split, :].drop(columns=['index',
@@ -225,7 +226,7 @@ def divide_train_val(df_pp, month, drop):
     return train_x, train_y, val_x, val_y
 
 
-## Divide into high-rank / Low-rank (BY: mean_sales_origin)
+# Divide into high-rank / Low-rank (BY: mean_sales_origin)
 def divide_top(df, num_train, num_val):
     top_df = df.sort_values('mean_sales_origin', ascending=False)
 

@@ -1,3 +1,6 @@
+# target
+TARGET = '취급액'
+
 # directories
 
 LOCAL_DIR = ".."
