@@ -6,8 +6,10 @@ TARGET = '취급액'
 LOCAL_DIR = ".."
 MODELS_DIR = LOCAL_DIR + "/data/saved_models/"
 PROCESSED_DATA_DIR = LOCAL_DIR + "/data/20/"
-FEATURED_DATA_DIR = LOCAL_DIR + '/data/fin_data/'
+FEATURED_DATA_DIR = LOCAL_DIR + '/data/20/'
 SUBMISSION_DIR = LOCAL_DIR + "/submission/"
+OPT_DATA_DIR = LOCAL_DIR + "/data/13/"
+RAW_DATA_DIR = LOCAL_DIR + "/data/00/"
 
 # set some Global Vars
 
@@ -32,3 +34,5 @@ cat_col = ['상품군', 'weekdays', 'show_id', 'small_c', 'middle_c', 'big_c',
 
 encoded_cols = ['상품코드', '상품군', 'weekdays', 'parttime', 'show_id','small_c', 'middle_c',
                 'big_c', 'original_c', 'pay', 'exposed_t']
+
+base_cols = ['방송일시', '노출(분)', '마더코드', '상품코드', '상품명', '상품군', '판매단가', '취급액']

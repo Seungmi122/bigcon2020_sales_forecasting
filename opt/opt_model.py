@@ -42,7 +42,7 @@ for row, column in indexes:
 
 print(f'total profit={total}')
 
-full_items_list = pd.read_excel("../data/20/tmp_hung_firstweek_items.xlsx")
+full_items_list = pd.read_excel(OPT_DATA_DIR + "firstw_items.xlsx")
 full_items_list.drop(columns=['Unnamed: 0', 'small_c_code', 'middle_c_code','big_c_code'], inplace=True)
 hung_out = full_items_list.copy()
 hung_out['방송일시'] = np.nan
@@ -55,7 +55,7 @@ for i in indexes:
 hung_out.drop(columns=['노출(분)'], inplace=True)
 hung_out.sort_values(['방송일시'], ascending=True, inplace=True)
 hung_out.set_index('방송일시', inplace=True)
-hung_out.to_excel("../data/20/opt_light_output.xlsx")
+hung_out.to_excel(OPT_DATA_DIR + "hdirect_output.xlsx")
 print("hungarian with 1 hierarchy completed")
 
 #######################
@@ -65,7 +65,7 @@ hung2_PP['pred'] = lgbm_preds_opt2
 hung2_PP['방송일시'] = hung2.방송일시
 hung2_PP['ymd'] = [d.date() for d in hung2_PP["방송일시"]]
 
-prod_list = pd.read_excel('../data/01/2020sales_opt_temp_list.xlsx')
+prod_list = pd.read_excel(OPT_DATA_DIR + 'firstm_items.xlsx')
 
 h1_output = []
 h2_output = []
@@ -173,15 +173,8 @@ h2_output_name = h2_output_name.astype({'상품코드': 'int64'})
 h2_output_final = pd.merge(h2_output_name, prod_list.drop(columns = ['상품코드']), on=['상품명'], how='left').drop('row_num', 1)
 
 h1_output['n'] = 1
-h1_output.pivot_table(index='방송일시', columns='상품군', fill_value=0).to_excel('../data/20/h1_output.xlsx')
-h2_output_final.to_excel('../data/20/h2_output.xlsx')
+h1_output.pivot_table(index='방송일시', columns='상품군', fill_value=0).to_excel(OPT_DATA_DIR + 'h1_output.xlsx')
+h2_output_final.to_excel(OPT_DATA_DIR + 'h2_output.xlsx')
 
-# tmp = pd.read_pickle("../data/20/test_v2.pkl")
-# tmp2 = tmp.loc[tmp.months==6,].groupby(['days','상품군']).show_id.nunique().to_frame()
-# tmp2.reset_index(inplace=True)
-# tmp3 = tmp2.pivot_table(index='days', columns='상품군',aggfunc=sum, margins=True,
-#                         dropna=True, fill_value=0)
-# tmp4 = tmp3.div( tmp3.iloc[:,-1], axis=0)
-# tmp4.mean(axis=0)
-
+#
 print("hungarian with 2 hierarchy completed")

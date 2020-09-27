@@ -204,8 +204,15 @@ def get_mae(y_true, y_pred):
     mae = np.mean(np.abs(y_true - y_pred))
     return mae
 
-# CV splits
+
 def cv_split(df, month, printprop=False):
+    """
+    :objective: get index to create cross validation dataset
+    :param df: pandas dataframe
+    :param month: int - from 1 to 12, month to be splited
+    :param printprop: boolean - whether to print proportion of cv to full data
+    :return: int - index for full data to be splited
+    """
     split = int(df[df['months'] == month].index.values.max())
     prop = str(split / df.shape[0])
     if printprop:
@@ -214,8 +221,15 @@ def cv_split(df, month, printprop=False):
     else:
         return split
 
-# Divide into train/test
+
 def divide_train_val(df_pp, month, drop):
+    """
+    :objective: divide full data into train, validation
+    :param df_pp: pandas dataframe, preprocessed
+    :param month: int - from 1 to 12, month to be splited
+    :param drop: list of str - columns to be dropped
+    :return: pd.DataFrame
+    """
     split = cv_split(df=df_pp, month=month)
     train_x = df_pp.iloc[:split, :].drop(columns=['index',
                                                   'show_id', TARGET] + drop)  ## 'index' check!!
@@ -226,8 +240,14 @@ def divide_train_val(df_pp, month, drop):
     return train_x, train_y, val_x, val_y
 
 
-# Divide into high-rank / Low-rank (BY: mean_sales_origin)
 def divide_top(df, num_train, num_val):
+    """
+    :objective: divide full data by mean_sales_origin ranking
+    :param df: pandas dataframe
+    :param num_train: int - index to divide train and val
+    :param num_val: int - index to divide train and val
+    :return: pandas dataframe
+    """
     top_df = df.sort_values('mean_sales_origin', ascending=False)
 
     top_tr_lag_x = top_df.iloc[:num_train, :].drop(['index', 'show_id', TARGET], axis=1)

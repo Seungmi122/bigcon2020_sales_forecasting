@@ -30,26 +30,34 @@ counter_fin_wk_lag_PP.drop(columns=['show_id', TARGET], inplace=True)
 
 # Divide data
 # WD
-train_wd_lag_x, train_wd_lag_y, val_wd_lag_x, val_wd_lag_y = divide_train_val(df_wd_lag_PP_counter, 8, drop=[])
-top_wd_lag, top_tr_wd_lag_x, top_tr_wd_lag_y, top_v_wd_lag_x, top_v_wd_lag_y = divide_top(df_wd_lag_PP_counter, 4004, 2013)
+train_wd_cnt_x, train_wd_cnt_y, val_wd_cnt_x, val_wd_cnt_y = divide_train_val(df_wd_lag_PP_counter, 8, drop=[])
+top_wd_cnt, top_tr_wd_cnt_x, top_tr_wd_cnt_y, top_v_wd_cnt_x, top_v_wd_cnt_y = divide_top(df_wd_lag_PP_counter, 4004, 2013)
 # WK
-train_wk_lag_x, train_wk_lag_y, val_wk_lag_x, val_wk_lag_y = divide_train_val(df_wk_lag_PP_counter, 8, drop=[])
-top_wk_lag, top_tr_wk_lag_x, top_tr_wk_lag_y, top_v_wk_lag_x, top_v_wk_lag_y = divide_top(df_wk_lag_PP_counter, 2206, 999)
+train_wk_cnt_x, train_wk_cnt_y, val_wk_cnt_x, val_wk_cnt_y = divide_train_val(df_wk_lag_PP_counter, 8, drop=[])
+top_wk_cnt, top_tr_wk_cnt_x, top_tr_wk_cnt_y, top_v_wk_cnt_x, top_v_wk_cnt_y = divide_top(df_wk_lag_PP_counter, 2206, 999)
 
 
 ######################
 ######## Train #######
 ######################
+params_all_wd_cnt = params_all_wd.copy()
+params_all_wd_cnt['categorical_feature'] = [4, 10, 11, 12]
+params_all_wk_cnt = params_all_wk.copy()
+params_all_wk_cnt['categorical_feature'] = [4, 10, 11, 12]
+params_top_wd_cnt = params_top_wd.copy()
+params_top_wd_cnt['categorical_feature'] = [4, 10, 11, 12]
+params_top_wk_cnt = params_top_wk.copy()
+params_top_wk_cnt['categorical_feature'] = [4, 10, 11, 12]
 # # base model
-# model_wd_all, _ = run_lgbm(params_all_wd, train_wd_lag_x, train_wd_lag_y,
-#                                       val_wd_lag_x, val_wd_lag_y, 'wd_all_counter')
-# model_wk_all, _ = run_lgbm(params_all_wk, train_wk_lag_x, train_wk_lag_y,
-#                                       val_wk_lag_x, val_wk_lag_y, 'wk_all_counter')
+# model_wd_all, _ = run_lgbm(params_all_wd_cnt, train_wd_cnt_x, train_wd_cnt_y,
+#                            val_wd_cnt_x, val_wd_cnt_y, 'wd_all_counter')
+# model_wk_all, _ = run_lgbm(params_all_wk_cnt, train_wk_cnt_x, train_wk_cnt_y,
+#                            val_wk_cnt_x, val_wk_cnt_y, 'wk_all_counter')
 # # top model
-# model_wd_top, _ = run_lgbm(params_top_wd, top_tr_wd_lag_x, top_tr_wd_lag_y,
-#                                       top_v_wd_lag_x, top_v_wd_lag_y, 'wd_top_counter')
-# model_wk_top, _ = run_lgbm(params_top_wk, top_tr_wk_lag_x, top_tr_wk_lag_y,
-#                                       top_v_wk_lag_x, top_v_wk_lag_y, 'wk_top_counter')
+# model_wd_top, _ = run_lgbm(params_top_wd_cnt, top_tr_wd_cnt_x, top_tr_wd_cnt_y,
+#                            top_v_wd_cnt_x, top_v_wd_cnt_y, 'wd_top_counter')
+# model_wk_top, _ = run_lgbm(params_top_wk_cnt, top_tr_wk_cnt_x, top_tr_wk_cnt_y,
+#                            top_v_wk_cnt_x, top_v_wk_cnt_y, 'wk_top_counter')
 
 ######################
 ###### Predict #######
@@ -83,7 +91,9 @@ counter_fin_wk_lag[TARGET] = counter_mixed_wk[TARGET]
 
 counter_combined = pd.concat([counter_fin_wd_lag,counter_fin_wk_lag], axis=0)
 counter_combined.sort_values(['방송일시'], inplace=True)
-counter_combined.to_pickle("../data/20/counterfact_predicted.pkl")
+counter_combined = counter_combined.loc[:, base_cols]
+counter_combined.to_excel(FEATURED_DATA_DIR + "counterfact_output.xlsx")
+print("finish to run counterfactual data")
 
 
 

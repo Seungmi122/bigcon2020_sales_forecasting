@@ -7,11 +7,7 @@ import datetime
 # data
 import pickle
 
-# sklearn
-from sklearn.preprocessing import RobustScaler
-
 # model
-from bayes_opt import BayesianOptimization
 from lightgbm import LGBMRegressor
 
 # visualize

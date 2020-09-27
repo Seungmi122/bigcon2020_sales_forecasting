@@ -11,9 +11,11 @@ import datetime
 import itertools
 import json
 
+from engine.vars import *
+
 
 class Features:
-    def __init__(self, types, counterfactual=False, not_divided = False):
+    def __init__(self, types, counterfactual=False, not_divided=False):
         """
         :objective: load data and engineer features
         :param test: boolean  - whether to get test data. if false, we can work on raw train dataset(2019 sales)
@@ -23,17 +25,17 @@ class Features:
         self.not_divided = not_divided
         
         if self.type == 'hungarian':
-            df = pd.read_excel("../data/01/2020sales_hungarian_2level.xlsx")
+            df = pd.read_excel(OPT_DATA_DIR + "hhierarchy.xlsx")
         elif self.type == "hungarian_h1":
-            df = pd.read_pickle("../data/20/hung1_firstwk.pkl")
+            df = pd.read_pickle(OPT_DATA_DIR + "hdirect.pkl")
         elif self.type == 'test':
-            df = pd.read_excel("../data/00/202006schedule.xlsx", skiprows=1)
+            df = pd.read_excel(RAW_DATA_DIR + "202006schedule.xlsx", skiprows=1)
         else:
-            df = pd.read_csv("../data/00/2019sales.csv", skiprows=1)
+            df = pd.read_excel(RAW_DATA_DIR + "2019sales.xlsx", skiprows=1)
             # adjust data types
             df.rename(columns={' 취급액 ': '취급액'}, inplace=True)
-            df.취급액 = df.취급액.str.replace(",", "").astype(float)
-            df.판매단가 = df.판매단가.str.replace(",", "").replace(' - ', np.nan).astype(float)
+            # df.취급액 = df.취급액.str.replace(",", "").astype(float)
+            # df.판매단가 = df.판매단가.str.replace(",", "").replace(' - ', np.nan).astype(float)
             df['volume'] = df['취급액'] / df['판매단가']
 
         # define data types
@@ -770,14 +772,11 @@ class Features:
         if self.type != 'train':
             self.train['day_hour'] = self.train.days.astype(str) + '/' + self.train.hours.astype(str)
             if self.not_divided:
-                full_train = pd.read_pickle("../data/20/train_fin_light_ver.pkl")
-                lag_cols = ['day_hour','lag_sales_1', 'lag_sales_2',
-                            'lag_sales_5', 'lag_sales_7']
+                full_train = pd.read_pickle(PROCESSED_DATA_DIR + "train_fin_light_ver.pkl")
+                lag_cols = ['day_hour'] + full_lag_col
             else:
-                full_train = pd.read_pickle("../data/20/train_v2.pkl")
-                lag_cols = ['day_hour', 'lag_sales_wd_1', 'lag_sales_wd_2',
-                            'lag_sales_wd_3', 'lag_sales_wd_4', 'lag_sales_wd_5', 'lag_sales_wk_1',
-                            'lag_sales_wk_2']
+                full_train = pd.read_pickle(PROCESSED_DATA_DIR + "train_v2.pkl")
+                lag_cols = ['day_hour'] + lag_wd + lag_wk
 
             if self.counterfactual:
                 train_cf = full_train.loc[
@@ -874,7 +873,7 @@ class Features:
         """
         # stack 2019-12 data to get lag vars if self.type == 'test'
         if self.type != "train":
-            full_train = pd.read_pickle("../data/20/train_v2.pkl")
+            full_train = pd.read_pickle(PROCESSED_DATA_DIR + "train_v2.pkl")
             
             # extract 2019-dec data
             train_dec = full_train.loc[(full_train.months == 12)]
@@ -1226,57 +1225,45 @@ class Features:
         self.get_lag_small_c_count()
         self.get_lag_all_price_show()
         self.get_lag_all_price_day()
-        print("finish getting all lag data")
-        print(self.train.shape, ": df shape")
 
         self.check_brand_power()
-        print("finish getting brand power data")
-        print(self.train.shape, ": df shape")
-
         self.check_steady_sellers()
         self.check_men_items()
         self.check_luxury_items()
         self.check_pay()
 
         self.get_season_items()
-        print("finish getting season_items data")
-        print(self.train.shape, ": df shape")
-        
+
         self.add_small_c_clickr()
-        print("finish getting click ratio data")
-        print(self.train.shape, ": df shape")
         self.add_mid_c_clickr()
-        print("finish getting click ratio data")
-        print(self.train.shape, ": df shape")
         self.add_big_c_clickr()
-        print("finish getting click ratio data")
-        print(self.train.shape, ": df shape")
-        
+
         self.get_weather()
-        print("finish getting weather data")
-        print(self.train.shape, ": df shape")
         self.price_to_rate()
         self.round_exposed()
         
         self.add_age_click_ratio()
         self.add_device_click_ratio()
-        print("finish getting add_device_click_ratio data")
-        print(self.train.shape, ": df shape")
         self.get_rolling_means()
-        print("finish getting get_rolling_means data")
-        print(self.train.shape, ": df shape")
         self.get_mean_sales_origin()
-        print("finish getting get_mean_sales_origin data")
-        print(self.train.shape, ": df shape")
-        #
-        ### not dividedd
         self.get_lag_sales()
-        print("finish getting get_lag_sales data")
-        print(self.train.shape, ": df shape")
         self.get_ts_pred()
-        print("finish getting get_ts_pred data")
         print(self.train.shape, ": df shape")
 
+        if not self.not_divided:
+            featured_wd_lag = self.train.loc[self.train.weekends == 0]
+            featured_wd_lag.drop(columns=lag_wk, inplace=True)
+            featured_wk_lag = self.train.loc[self.train.weekends == 1]
+            featured_wk_lag.drop(columns=lag_wd, inplace=True)
+
+            if self.type == "train":
+                self.train.to_pickle(PROCESSED_DATA_DIR + "{}_v2.pkl".format(self.type))
+
+            if not self.counterfactual:
+                featured_wk_lag.to_pickle(PROCESSED_DATA_DIR + "{}_fin_wk_lag.pkl".format(self.type))
+                featured_wd_lag.to_pickle(PROCESSED_DATA_DIR + "{}_fin_wd_lag.pkl".format(self.type))
+        else:
+            self.train.to_pickle(PROCESSED_DATA_DIR + "{}_fin_light_ver.pkl".format(self.type))
         return self.train
 
     def run_hungarian(self):
@@ -1298,17 +1285,12 @@ class Features:
         self.freq_items()
 
         self.check_brand_power()
-        print("finish getting brand power data")
-        print(self.train.shape, ": df shape")
-
         self.check_steady_sellers()
         self.check_men_items()
         self.check_luxury_items()
         self.check_pay()
 
         self.get_season_items()
-        print("finish getting season_items data")
-        print(self.train.shape, ": df shape")
         self.add_small_c_clickr()
         self.add_mid_c_clickr()
         self.add_big_c_clickr()
@@ -1316,39 +1298,21 @@ class Features:
 
         self.add_age_click_ratio()
         self.add_device_click_ratio()
-        print("finish getting add_device_click_ratio data")
-        print(self.train.shape, ": df shape")
         self.get_rolling_means()
-        print("finish getting get_rolling_means data")
-        print(self.train.shape, ": df shape")
         self.get_mean_sales_origin()
-        print("finish getting get_mean_sales_origin data")
-        print(self.train.shape, ": df shape")
 
         self.get_lag_sales()
-        print("finish getting get_lag_sales data")
-        print(self.train.shape, ": df shape")
         self.get_ts_pred()
-        print("finish getting get_ts_pred data")
         print(self.train.shape, ": df shape")
-
 
         return self.train
 
 
-# t = Features(types = "train", not_divided = False)
-# train = t.run_all()
-# train.to_pickle("../data/20/train_v2.pkl")
-# train.to_pickle("../data/20/train_fin_light_ver.pkl")
-# t =Features(types = 'test')
-# test_v2 = t.run_all()
-# test_v2.to_pickle("../data/20/test_v2.pkl")
-# test_v2.to_pickle("../data/20/test_fin_light_ver.pkl")
-# t = Features(types = "hungarian_h1")
-# hung = t.run_hungarian()
-# hung.to_pickle("../data/20/hung_featured_1.pkl")
-#
-# t =Features(types = 'test', counterfactual=True)
-# counterfact = t.run_all()
-# counterfact.to_pickle("../data/20/test_counterfact.pkl")
+if __name__ == "__main__":
+    train_lag = Features(types="train", not_divided=False)
+    train_lag.run_all()
+    train_full = Features(types="train", not_divided=True)
+    train_full.run_all()
+    test_lag = Features(types="test", not_divided=False)
+    test_lag.run_all()
 
