@@ -5,6 +5,7 @@ TARGET = '취급액'
 
 LOCAL_DIR = ".."
 MODELS_DIR = LOCAL_DIR + "/data/saved_models/"
+PROCESSED_DATA_DIR = LOCAL_DIR + "/data/20/"
 FEATURED_DATA_DIR = LOCAL_DIR + '/data/fin_data/'
 SUBMISSION_DIR = LOCAL_DIR + "/submission/"
 
@@ -28,3 +29,6 @@ cat_col = ['상품군', 'weekdays', 'show_id', 'small_c', 'middle_c', 'big_c',
            'min_start', 'primetime', 'prime_smallc',
            'freq', 'bpower', 'steady', 'men', 'pay', 'luxury',
            'spring', 'summer', 'fall', 'winter', 'rain']
+
+encoded_cols = ['상품코드', '상품군', 'weekdays', 'parttime', 'show_id','small_c', 'middle_c',
+                'big_c', 'original_c', 'pay', 'exposed_t']

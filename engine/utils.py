@@ -98,7 +98,7 @@ def get_label_features(df):
     :objective: Show features that need labelencoding
     :return: list
     """
-    lab_col = df.select_dtypes(include=['object','category']).columns.tolist()
+    lab_col = df.select_dtypes(include=['object', 'category']).columns.tolist()
 
     return lab_col
 

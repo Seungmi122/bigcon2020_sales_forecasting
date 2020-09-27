@@ -17,12 +17,12 @@ from munkres import Munkres
 
 lgbm_model_path = MODELS_DIR + 'lgbm_opt_mape_lr001_all.bin'
 estimator = pickle.load(open(lgbm_model_path, 'rb'))
-lgbm_preds_opt1 = estimator.predict(hung1_PP.drop(columns=['small_c', 'show_id', '상품코드']))
-lgbm_preds_opt2 = estimator.predict(hung2_PP.drop(columns=['small_c', 'show_id', '상품코드']))
+lgbm_preds_opt1 = estimator.predict(hung1_PP.drop(columns=['original_c', 'show_id', '상품코드', TARGET]))
+lgbm_preds_opt2 = estimator.predict(hung2_PP.drop(columns=['original_c', 'show_id', '상품코드', TARGET]))
 
-######################
-######## Model #######
-######################
+#######################
+######## Model1 #######
+#######################
 
 hung_mat = lgbm_preds_opt1.reshape((125, 125))  #rows: items, cols: time
 matrix = hung_mat
@@ -58,9 +58,9 @@ hung_out.set_index('방송일시', inplace=True)
 hung_out.to_excel("../data/20/opt_light_output.xlsx")
 print("hungarian with 1 hierarchy completed")
 
-####################################################################
-########################### Hung2 ##################################
-####################################################################
+#######################
+######## Model2 #######
+#######################
 hung2_PP['pred'] = lgbm_preds_opt2
 hung2_PP['방송일시'] = hung2.방송일시
 hung2_PP['ymd'] = [d.date() for d in hung2_PP["방송일시"]]
@@ -70,6 +70,7 @@ prod_list = pd.read_excel('../data/01/2020sales_opt_temp_list.xlsx')
 h1_output = []
 h2_output = []
 cat = prod_list.상품군.unique()
+cat.sort()
 h2_total = 0
 
 
@@ -166,10 +167,10 @@ print(f'total profit={h2_total}')
 h1_output = pd.concat(h1_output)
 h2_output_fin = h2_output_fin.sort_values('방송일시')
 h2_output_name = pd.merge(h2_output_fin, hung_list, left_on='상품코드', right_on='row_num', how='left')
-h2_output_name = h2_output_name.drop(['상품코드_x'], axis=1)
-h2_output_name = h2_output_name.rename(columns={'상품코드_y': '상품코드'})
+h2_output_name = h2_output_name.drop(['상품코드_y'], axis=1)
+h2_output_name = h2_output_name.rename(columns={'상품코드_x': '상품코드'})
 h2_output_name = h2_output_name.astype({'상품코드': 'int64'})
-h2_output_final = pd.merge(h2_output_name, prod_list, on=['상품코드', '상품명'], how='left').drop('row_num', 1)
+h2_output_final = pd.merge(h2_output_name, prod_list.drop(columns = ['상품코드']), on=['상품명'], how='left').drop('row_num', 1)
 
 h1_output['n'] = 1
 h1_output.pivot_table(index='방송일시', columns='상품군', fill_value=0).to_excel('../data/20/h1_output.xlsx')

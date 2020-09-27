@@ -25,24 +25,35 @@ from engine.vars import *
 ###############################################################################
 ################################# Load Data ###################################
 ###############################################################################
-# Import 6 types of dataset
+# Import 2 types of dataset
 # Descriptions:
 #   - df_wd_lag : weekday / + lags
 #   - df_wk_lag: weekend / + lags
-#   - df_all_lag : all days / +lags
 
 df_wd_lag = load_df(FEATURED_DATA_DIR + '/train_fin_wd_lag.pkl')
 df_wk_lag = load_df(FEATURED_DATA_DIR + '/train_fin_wk_lag.pkl')
-df_all_lag = load_df(FEATURED_DATA_DIR + '/train_fin_light_ver.pkl')
 
+df_wd_test = load_df(FEATURED_DATA_DIR + '/test_fin_wd_lag.pkl')
+df_wk_test = load_df(FEATURED_DATA_DIR + '/test_fin_wk_lag.pkl')
+
+# combined data for label encoding
+tmp_combined = pd.concat([df_wd_lag, df_wk_lag, df_wd_test, df_wk_test]).drop(columns=['index'])
 ###############################################################################
 ############################### Preprocess  ##################################
 ###############################################################################
 
 # Preprocessed datasets
-df_wk_lag_PP = run_preprocess(df_wk_lag)
-df_wd_lag_PP = run_preprocess(df_wd_lag)
+tmp_combined = run_preprocess(tmp_combined)
+df_wd_lag_PP = tmp_combined.loc[:, tmp_combined.columns.isin(df_wd_lag.columns)].iloc[:df_wd_lag.shape[0]].reset_index()
+df_wk_lag_PP = tmp_combined.loc[:, tmp_combined.columns.isin(df_wk_lag.columns)]\
+                .iloc[df_wd_lag.shape[0]:(df_wd_lag.shape[0]+df_wk_lag.shape[0])].reset_index()
+df_wd_test_PP = tmp_combined.loc[:, tmp_combined.columns.isin(df_wd_test.columns)]\
+                .iloc[(df_wd_lag.shape[0]+df_wk_lag.shape[0]):(df_wd_lag.shape[0]+df_wk_lag.shape[0]+df_wd_test.shape[0])]
+df_wk_test_PP = tmp_combined.loc[:, tmp_combined.columns.isin(df_wk_test.columns)].iloc[-df_wk_test.shape[0]:]
 
+# write pickle for test data
+df_wd_test_PP.to_pickle(FEATURED_DATA_DIR + 'test_fin_wd_PP.pkl')
+df_wk_test_PP.to_pickle(FEATURED_DATA_DIR + 'test_fin_wk_PP.pkl')
 # Divide data
 # WD
 train_wd_lag_x, train_wd_lag_y, val_wd_lag_x, val_wd_lag_y = divide_train_val(df_wd_lag_PP, 8, drop=[])
@@ -206,8 +217,7 @@ def mix_results(true_y, pred_y):
     plt.yticks(fontsize=20)
     plt.xlabel('Time', fontsize=20)
     plt.ylabel('Sales', fontsize=20)
-
-    plt.savefig('../mixed_model'+ str(datetime.now().strftime('%H_%M')) + '.png')
+    plt.show()
 
     print(f'MAPE of mixed model is {get_mape(true_y, pred_y)}')
     print(f'MAE of mixed model is {get_mae(true_y, pred_y)}')
@@ -226,7 +236,7 @@ def run_models():
     model_wk_top, preds_wk_top = run_lgbm(params_top_wk, top_tr_wk_lag_x, top_tr_wk_lag_y,
                                           top_v_wk_lag_x, top_v_wk_lag_y, 'wk_top')
     # mixed
-    mixed_wd = mixed_df(model_wd_top, top_wd_lag, val_wd_lag_x, preds_wd_all, num_top=6000)
+    mixed_wd = mixed_df(model_wd_top, top_wd_lag, val_wd_lag_x, preds_wd_all, num_top=6017)
     mix_results(val_wd_lag_y, mixed_wd[TARGET])
     mixed_wk = mixed_df(model_wk_top, top_wk_lag, val_wk_lag_x, preds_wk_all, num_top=3205)
     mix_results(val_wk_lag_y, mixed_wk[TARGET])
@@ -339,7 +349,7 @@ def feature_importance(model_df):
     :return:
     """
     feature_imp = pd.DataFrame(sorted(zip(model_df.feature_importances_, train_wd_lag_x.columns)),
-                                      columns=['Value', 'Feature'])
+                               columns=['Value', 'Feature'])
     plt.figure(figsize=(20, 10))
 
     # Full length

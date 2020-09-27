@@ -29,10 +29,9 @@ def predict():
     model_wk_top = pickle.load(open(model_path, 'rb'))
 
     # wd
-    test_wd_origin = load_df(FEATURED_DATA_DIR + 'test_fin_wd_lag.pkl').drop('index', axis=1)
-    test_wd = test_wd_origin.copy()
-    test_wd = run_preprocess(test_wd)
-    test_wd = test_wd.drop(['show_id', TARGET], axis=1)
+    test_wd_origin = load_df(FEATURED_DATA_DIR + 'test_fin_wd_lag.pkl')
+    test_wd = load_df(FEATURED_DATA_DIR + 'test_fin_wd_PP.pkl').copy()
+    test_wd = test_wd.drop(['index', 'show_id', TARGET], axis=1)
     test_wd_sort = test_wd.sort_values('mean_sales_origin', ascending=False)
     # Predict all observations
     pred_test_wd_all = model_wd_all.predict(test_wd)
@@ -41,10 +40,9 @@ def predict():
     test_wd_origin[TARGET] = test_mixed_wd[TARGET]
 
     # wk
-    test_wk_origin = load_df(FEATURED_DATA_DIR + 'test_fin_wk_lag.pkl').drop('index', axis=1)
-    test_wk = test_wk_origin.copy()
-    test_wk = run_preprocess(test_wk)
-    test_wk = test_wk.drop(['show_id', TARGET], axis=1)
+    test_wk_origin = load_df(FEATURED_DATA_DIR + 'test_fin_wk_lag.pkl')
+    test_wk = load_df(FEATURED_DATA_DIR + 'test_fin_wk_PP.pkl').copy()
+    test_wk = test_wk.drop(['index', 'show_id', TARGET], axis=1)
     test_wk_sort = test_wk.sort_values('mean_sales_origin', ascending=False)
     # Predict all observations
     pred_test_wk_all = model_wk_all.predict(test_wk)
@@ -52,7 +50,7 @@ def predict():
     test_mixed_wk = mixed_df(model_wk_top, test_wk_sort, test_wk, pred_test_wk_all, num_top=249)
     test_wk_origin[TARGET] = test_mixed_wk[TARGET]
     # two outputs
-    return test_wd_origin, test_wk_origin
+    return test_wd_origin.drop(columns = ['index']), test_wk_origin.drop(columns = ['index'])
 
 
 def submission(wd, wk):
@@ -67,7 +65,7 @@ def submission(wd, wk):
     test_final_full = pd.concat([test_final_wd, test_final_wk], axis=0)
     test_final_full.sort_values(['방송일시'], inplace=True)
 
-    test_final_full.to_csv(SUBMISSION_DIR + 'submission.csv', index=False)
+    test_final_full.to_excel(SUBMISSION_DIR + 'submission.xlsx', index=False)
 
 
 def mixed_df(model_top, top_df, val_all_df_x, preds_all, num_top):
