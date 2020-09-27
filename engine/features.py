@@ -34,8 +34,6 @@ class Features:
             df = pd.read_excel(RAW_DATA_DIR + "2019sales.xlsx", skiprows=1)
             # adjust data types
             df.rename(columns={' 취급액 ': '취급액'}, inplace=True)
-            # df.취급액 = df.취급액.str.replace(",", "").astype(float)
-            # df.판매단가 = df.판매단가.str.replace(",", "").replace(' - ', np.nan).astype(float)
             df['volume'] = df['취급액'] / df['판매단가']
 
         # define data types
@@ -772,10 +770,10 @@ class Features:
         if self.type != 'train':
             self.train['day_hour'] = self.train.days.astype(str) + '/' + self.train.hours.astype(str)
             if self.not_divided:
-                full_train = pd.read_pickle(PROCESSED_DATA_DIR + "train_fin_light_ver.pkl")
+                full_train = pd.read_pickle(FEATURED_DATA_DIR + "train_fin_light_ver.pkl")
                 lag_cols = ['day_hour'] + full_lag_col
             else:
-                full_train = pd.read_pickle(PROCESSED_DATA_DIR + "train_v2.pkl")
+                full_train = pd.read_pickle(FEATURED_DATA_DIR + "train_v2.pkl")
                 lag_cols = ['day_hour'] + lag_wd + lag_wk
 
             if self.counterfactual:
@@ -873,7 +871,7 @@ class Features:
         """
         # stack 2019-12 data to get lag vars if self.type == 'test'
         if self.type != "train":
-            full_train = pd.read_pickle(PROCESSED_DATA_DIR + "train_v2.pkl")
+            full_train = pd.read_pickle(FEATURED_DATA_DIR + "train_v2.pkl")
             
             # extract 2019-dec data
             train_dec = full_train.loc[(full_train.months == 12)]
@@ -1257,13 +1255,13 @@ class Features:
             featured_wk_lag.drop(columns=lag_wd, inplace=True)
 
             if self.type == "train":
-                self.train.to_pickle(PROCESSED_DATA_DIR + "{}_v2.pkl".format(self.type))
+                self.train.to_pickle(FEATURED_DATA_DIR + "{}_v2.pkl".format(self.type))
 
             if not self.counterfactual:
-                featured_wk_lag.to_pickle(PROCESSED_DATA_DIR + "{}_fin_wk_lag.pkl".format(self.type))
-                featured_wd_lag.to_pickle(PROCESSED_DATA_DIR + "{}_fin_wd_lag.pkl".format(self.type))
+                featured_wk_lag.to_pickle(FEATURED_DATA_DIR + "{}_fin_wk_lag.pkl".format(self.type))
+                featured_wd_lag.to_pickle(FEATURED_DATA_DIR + "{}_fin_wd_lag.pkl".format(self.type))
         else:
-            self.train.to_pickle(PROCESSED_DATA_DIR + "{}_fin_light_ver.pkl".format(self.type))
+            self.train.to_pickle(FEATURED_DATA_DIR + "{}_fin_light_ver.pkl".format(self.type))
         return self.train
 
     def run_hungarian(self):
@@ -1314,5 +1312,7 @@ if __name__ == "__main__":
     train_full = Features(types="train", not_divided=True)
     train_full.run_all()
     test_lag = Features(types="test", not_divided=False)
+    test_lag.run_all()
+    test_lag = Features(types="test", not_divided=True)
     test_lag.run_all()
 

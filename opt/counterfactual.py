@@ -49,15 +49,15 @@ params_top_wd_cnt['categorical_feature'] = [4, 10, 11, 12]
 params_top_wk_cnt = params_top_wk.copy()
 params_top_wk_cnt['categorical_feature'] = [4, 10, 11, 12]
 # # base model
-# model_wd_all, _ = run_lgbm(params_all_wd_cnt, train_wd_cnt_x, train_wd_cnt_y,
-#                            val_wd_cnt_x, val_wd_cnt_y, 'wd_all_counter')
-# model_wk_all, _ = run_lgbm(params_all_wk_cnt, train_wk_cnt_x, train_wk_cnt_y,
-#                            val_wk_cnt_x, val_wk_cnt_y, 'wk_all_counter')
-# # top model
-# model_wd_top, _ = run_lgbm(params_top_wd_cnt, top_tr_wd_cnt_x, top_tr_wd_cnt_y,
-#                            top_v_wd_cnt_x, top_v_wd_cnt_y, 'wd_top_counter')
-# model_wk_top, _ = run_lgbm(params_top_wk_cnt, top_tr_wk_cnt_x, top_tr_wk_cnt_y,
-#                            top_v_wk_cnt_x, top_v_wk_cnt_y, 'wk_top_counter')
+model_wd_all, _ = run_lgbm(params_all_wd_cnt, train_wd_cnt_x, train_wd_cnt_y,
+                           val_wd_cnt_x, val_wd_cnt_y, 'wd_all_counter')
+model_wk_all, _ = run_lgbm(params_all_wk_cnt, train_wk_cnt_x, train_wk_cnt_y,
+                           val_wk_cnt_x, val_wk_cnt_y, 'wk_all_counter')
+# top model
+model_wd_top, _ = run_lgbm(params_top_wd_cnt, top_tr_wd_cnt_x, top_tr_wd_cnt_y,
+                           top_v_wd_cnt_x, top_v_wd_cnt_y, 'wd_top_counter')
+model_wk_top, _ = run_lgbm(params_top_wk_cnt, top_tr_wk_cnt_x, top_tr_wk_cnt_y,
+                           top_v_wk_cnt_x, top_v_wk_cnt_y, 'wk_top_counter')
 
 ######################
 ###### Predict #######
@@ -92,7 +92,7 @@ counter_fin_wk_lag[TARGET] = counter_mixed_wk[TARGET]
 counter_combined = pd.concat([counter_fin_wd_lag,counter_fin_wk_lag], axis=0)
 counter_combined.sort_values(['방송일시'], inplace=True)
 counter_combined = counter_combined.loc[:, base_cols]
-counter_combined.to_excel(FEATURED_DATA_DIR + "counterfact_output.xlsx")
+counter_combined.to_excel(OPT_DATA_DIR + "counterfact_output.xlsx")
 print("finish to run counterfactual data")
 
 

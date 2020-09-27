@@ -15,16 +15,30 @@ from munkres import Munkres
 ####### Predict ######
 ######################
 
-lgbm_model_path = MODELS_DIR + 'lgbm_opt_mape_lr001_all.bin'
-estimator = pickle.load(open(lgbm_model_path, 'rb'))
-lgbm_preds_opt1 = estimator.predict(hung1_PP.drop(columns=['original_c', 'show_id', '상품코드', TARGET]))
-lgbm_preds_opt2 = estimator.predict(hung2_PP.drop(columns=['original_c', 'show_id', '상품코드', TARGET]))
+lgbm_model_path = MODELS_DIR + 'lgbm_finalmodel_all_opt.bin'
+model_opt_base = pickle.load(open(lgbm_model_path, 'rb'))
+lgbm_model_path = MODELS_DIR + 'lgbm_finalmodel_top_opt.bin'
+model_opt_top = pickle.load(open(lgbm_model_path, 'rb'))
+
+hung1_PP_copy = hung1_PP.copy().drop(columns=['original_c', 'show_id', '상품코드', TARGET])
+hung1_PP_sort = hung1_PP_copy.sort_values('mean_sales_origin', ascending=False)
+hung2_PP_copy = hung2_PP.copy().drop(columns=['original_c', 'show_id', '상품코드', TARGET])
+hung2_PP_sort = hung2_PP_copy.sort_values('mean_sales_origin', ascending=False)
+# Predict all observations
+pred_hung1 = model_opt_base.predict(hung1_PP_copy)
+pred_hung2 = model_opt_base.predict(hung2_PP_copy)
+# Mixed DF (Top: 249개)
+mixed_opt_hung1 = mixed_df(model_opt_top, hung1_PP_sort, hung1_PP_copy, pred_hung1, num_top=8000)
+hung1_PP[TARGET] = mixed_opt_hung1[TARGET]
+mixed_opt_hung2 = mixed_df(model_opt_top, hung2_PP_sort, hung2_PP_copy, pred_hung2, num_top=8000)
+hung2_PP[TARGET] = mixed_opt_hung2[TARGET]
+
 
 #######################
 ######## Model1 #######
 #######################
 
-hung_mat = lgbm_preds_opt1.reshape((125, 125))  #rows: items, cols: time
+hung_mat = pred_hung1.reshape((125, 125))  # rows: items, cols: time
 matrix = hung_mat
 cost_matrix = []
 for row in matrix:
@@ -61,7 +75,7 @@ print("hungarian with 1 hierarchy completed")
 #######################
 ######## Model2 #######
 #######################
-hung2_PP['pred'] = lgbm_preds_opt2
+hung2_PP['pred'] = pred_hung2
 hung2_PP['방송일시'] = hung2.방송일시
 hung2_PP['ymd'] = [d.date() for d in hung2_PP["방송일시"]]
 
@@ -167,14 +181,13 @@ print(f'total profit={h2_total}')
 h1_output = pd.concat(h1_output)
 h2_output_fin = h2_output_fin.sort_values('방송일시')
 h2_output_name = pd.merge(h2_output_fin, hung_list, left_on='상품코드', right_on='row_num', how='left')
-h2_output_name = h2_output_name.drop(['상품코드_y'], axis=1)
-h2_output_name = h2_output_name.rename(columns={'상품코드_x': '상품코드'})
+h2_output_name = h2_output_name.drop(['상품코드_x'], axis=1)
+h2_output_name = h2_output_name.rename(columns={'상품코드_y': '상품코드'})
 h2_output_name = h2_output_name.astype({'상품코드': 'int64'})
-h2_output_final = pd.merge(h2_output_name, prod_list.drop(columns = ['상품코드']), on=['상품명'], how='left').drop('row_num', 1)
+h2_output_final = pd.merge(h2_output_name, prod_list, on=['상품코드'], how='left').drop('row_num', 1)
 
 h1_output['n'] = 1
 h1_output.pivot_table(index='방송일시', columns='상품군', fill_value=0).to_excel(OPT_DATA_DIR + 'h1_output.xlsx')
 h2_output_final.to_excel(OPT_DATA_DIR + 'h2_output.xlsx')
 
-#
 print("hungarian with 2 hierarchy completed")

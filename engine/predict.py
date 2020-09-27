@@ -50,7 +50,7 @@ def predict():
     test_mixed_wk = mixed_df(model_wk_top, test_wk_sort, test_wk, pred_test_wk_all, num_top=249)
     test_wk_origin[TARGET] = test_mixed_wk[TARGET]
     # two outputs
-    return test_wd_origin.drop(columns = ['index']), test_wk_origin.drop(columns = ['index'])
+    return test_wd_origin.drop(columns=['index']), test_wk_origin.drop(columns=['index'])
 
 
 def submission(wd, wk):
@@ -60,12 +60,19 @@ def submission(wd, wk):
     :param wk: pd.DataFrame
     :return:
     """
+    # data with 판매단가 == 0
+    test_origin = pd.read_excel(RAW_DATA_DIR + "202006schedule.xlsx", skiprows=1)
+    test_origin = test_origin.loc[(test_origin.판매단가 == 0)]
+    test_origin = test_origin[['방송일시', '노출(분)', '마더코드', '상품코드', '상품명', '상품군', '판매단가', TARGET]]
+    test_origin[TARGET] = 0
+    # original data(wd/wk)
     test_final_wd = wd[['방송일시', '노출(분)', '마더코드', '상품코드', '상품명', '상품군', '판매단가', TARGET]]
     test_final_wk = wk[['방송일시', '노출(분)', '마더코드', '상품코드', '상품명', '상품군', '판매단가', TARGET]]
-    test_final_full = pd.concat([test_final_wd, test_final_wk], axis=0)
+    test_final_full = pd.concat([test_origin, test_final_wd, test_final_wk], axis=0)
     test_final_full.sort_values(['방송일시'], inplace=True)
-
+    # write excel file
     test_final_full.to_excel(SUBMISSION_DIR + 'submission.xlsx', index=False)
+    return test_final_full
 
 
 def mixed_df(model_top, top_df, val_all_df_x, preds_all, num_top):

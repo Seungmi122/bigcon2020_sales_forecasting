@@ -1,20 +1,21 @@
-# target
+#####################
+###### TARGET #######
+#####################
 TARGET = '취급액'
 
-# directories
-
+#####################
+#### DIRECTORIES ####
+#####################
 LOCAL_DIR = ".."
 MODELS_DIR = LOCAL_DIR + "/data/saved_models/"
-PROCESSED_DATA_DIR = LOCAL_DIR + "/data/20/"
 FEATURED_DATA_DIR = LOCAL_DIR + '/data/20/'
 SUBMISSION_DIR = LOCAL_DIR + "/submission/"
 OPT_DATA_DIR = LOCAL_DIR + "/data/13/"
 RAW_DATA_DIR = LOCAL_DIR + "/data/00/"
 
-# set some Global Vars
-
-data_list = ['df_wk_lag', 'df_wk_no_lag', 'df_wd_lag', 'df_wd_no_lag', 'df_all_lag']
-
+#####################
+#### GLOBAL VARS ####
+#####################
 lag_col1 = ['lag_scode_price', 'lag_scode_count', 'lag_mcode_price', 'lag_mcode_count', 'lag_bigcat_price',
             'lag_bigcat_count', 'lag_bigcat_price_day', 'lag_bigcat_count_day', 'lag_small_c_price',
             'lag_small_c_count', 'lag_all_price_show', 'lag_all_price_day']

@@ -2,7 +2,6 @@
 import warnings
 
 warnings.filterwarnings("ignore")
-import datetime
 
 # data
 import pickle
@@ -46,10 +45,13 @@ df_wk_lag_PP = tmp_combined.loc[:, tmp_combined.columns.isin(df_wk_lag.columns)]
 df_wd_test_PP = tmp_combined.loc[:, tmp_combined.columns.isin(df_wd_test.columns)]\
                 .iloc[(df_wd_lag.shape[0]+df_wk_lag.shape[0]):(df_wd_lag.shape[0]+df_wk_lag.shape[0]+df_wd_test.shape[0])]
 df_wk_test_PP = tmp_combined.loc[:, tmp_combined.columns.isin(df_wk_test.columns)].iloc[-df_wk_test.shape[0]:]
+df_test_PP = tmp_combined.loc[:, tmp_combined.columns.isin(df_wd_test.columns)]\
+                .iloc[(df_wd_lag.shape[0]+df_wk_lag.shape[0]):]
 
 # write pickle for test data
 df_wd_test_PP.to_pickle(FEATURED_DATA_DIR + 'test_fin_wd_PP.pkl')
 df_wk_test_PP.to_pickle(FEATURED_DATA_DIR + 'test_fin_wk_PP.pkl')
+df_test_PP.to_pickle(FEATURED_DATA_DIR + 'test_fin_light_ver.pkl')
 # Divide data
 # WD
 train_wd_lag_x, train_wd_lag_y, val_wd_lag_x, val_wd_lag_y = divide_train_val(df_wd_lag_PP, 8, drop=[])
@@ -171,13 +173,13 @@ params_top_wk = {'feature_fraction': 1,
 
 def mixed_df(model_top, top_df, val_all_df_x, preds_all, num_top):
     """
-    :objective:
-    :param model_top:
-    :param top_df:
-    :param val_all_df_x:
-    :param preds_all:
-    :param num_top:
-    :return:
+    :objective: combine results from step 1&2
+    :param model_top: LGBMRegressor - step 2 model
+    :param top_df: pandas Dataframe - divided df with high mean_sales_origin(by divide_top_function)
+    :param val_all_df_x: pandas Dataframe - validation x
+    :param preds_all: predicted y from step 1
+    :param num_top: int - index to be splitted
+    :return: pandas DataFrame
     """
     top_idx = set(top_df.iloc[:num_top, :].index)
     val_idx = set(val_all_df_x.index)
@@ -194,9 +196,9 @@ def mixed_df(model_top, top_df, val_all_df_x, preds_all, num_top):
 
 def mix_results(true_y, pred_y):
     """
-    :objective:
-    :param true_y:
-    :param pred_y:
+    :objective: draw plot of true and estimated value
+    :param true_y: pandas Series
+    :param pred_y: pandas Series
     :return: plot figure
     """
     # Plot TOP: Predicted vs. True values
@@ -236,8 +238,6 @@ def run_models():
     mix_results(val_wd_lag_y, mixed_wd[TARGET])
     mixed_wk = mixed_df(model_wk_top, top_wk_lag, val_wk_lag_x, preds_wk_all, num_top=3205)
     mix_results(val_wk_lag_y, mixed_wk[TARGET])
-
-    return mixed_wd, mixed_wk
 
 
 #####################################################################
@@ -331,7 +331,6 @@ def robust_cross_validation():
     mixed_wk_rb = mixed_df(model_top_rb, top_wk_rb, wk_dec_x, preds_wk_dec, num_top=3205)
     mix_results(wk_dec_y, mixed_wk_rb[TARGET])
 
-    return mixed_wd_rb, mixed_wk_rb
 
 # #####################################################################
 # ######################## Feature Importance #########################
