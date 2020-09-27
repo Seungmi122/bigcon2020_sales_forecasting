@@ -51,7 +51,7 @@ df_test_PP = tmp_combined.loc[:, tmp_combined.columns.isin(df_wd_test.columns)]\
 # write pickle for test data
 df_wd_test_PP.to_pickle(FEATURED_DATA_DIR + 'test_fin_wd_PP.pkl')
 df_wk_test_PP.to_pickle(FEATURED_DATA_DIR + 'test_fin_wk_PP.pkl')
-df_test_PP.to_pickle(FEATURED_DATA_DIR + 'test_fin_light_ver.pkl')
+df_test_PP.to_pickle(FEATURED_DATA_DIR + 'test_fin_light_ver_PP.pkl')
 # Divide data
 # WD
 train_wd_lag_x, train_wd_lag_y, val_wd_lag_x, val_wd_lag_y = divide_train_val(df_wd_lag_PP, 8, drop=[])

@@ -51,7 +51,7 @@ m = Munkres()
 indexes = m.compute(cost_matrix)
 total = 0
 for row, column in indexes:
-    value = matrix[row][column]
+    value = matrix[row][column]*3
     total += value
 
 print(f'total profit={total}')
@@ -118,7 +118,7 @@ for i in pd.date_range(start=datetime.datetime(2020, 6, 2, 1), end=datetime.date
     indexes = m.compute(cost_matrix)
     total = 0
     for row, column in indexes:
-        value = matrix[row][column]
+        value = matrix[row][column]*3
         total += value
 
     jun_day_hung.reset_index(inplace=True)
@@ -160,7 +160,7 @@ for i in pd.date_range(start=datetime.datetime(2020, 6, 2, 1), end=datetime.date
         total = 0
         pred_value = []
         for row, column in indexes:
-            value = matrix[row][column]
+            value = matrix[row][column]*3
             total += value
             h2_total += value
             pred_value += [value]
