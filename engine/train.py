@@ -25,11 +25,11 @@ from engine.vars import *
 #   - df_wd_lag : weekday / + lags
 #   - df_wk_lag: weekend / + lags
 
-df_wd_lag = load_df(FEATURED_DATA_DIR + '/train_fin_wd_lag.pkl')
-df_wk_lag = load_df(FEATURED_DATA_DIR + '/train_fin_wk_lag.pkl')
+df_wd_lag = load_df(FEATURED_DATA_DIR + 'train_fin_wd_lag.pkl')
+df_wk_lag = load_df(FEATURED_DATA_DIR + 'train_fin_wk_lag.pkl')
 
-df_wd_test = load_df(FEATURED_DATA_DIR + '/test_fin_wd_lag.pkl')
-df_wk_test = load_df(FEATURED_DATA_DIR + '/test_fin_wk_lag.pkl')
+df_wd_test = load_df(FEATURED_DATA_DIR + 'test_fin_wd_lag.pkl')
+df_wk_test = load_df(FEATURED_DATA_DIR + 'test_fin_wk_lag.pkl')
 
 # combined data for label encoding
 tmp_combined = pd.concat([df_wd_lag, df_wk_lag, df_wd_test, df_wk_test]).drop(columns=['index'])
