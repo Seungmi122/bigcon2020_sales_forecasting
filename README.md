@@ -31,7 +31,6 @@
 > - eda.ipynb : eda 과정 일체
 > - naver_shopping_crawling.ipynb : 네이버 쇼핑 트렌드의 클릭률 데이터 crawling
 > - naver_clickr_crawl.R : 클릭률 crawled data 통합
-> - seasonal.ipynb : 계절성 확인하기 위한 eda
 
 ### 3. engine 
   feature engineering/train/predict/residual analysis /기타 변수 정의
