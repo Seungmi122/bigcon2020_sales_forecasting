@@ -2,15 +2,6 @@
 import warnings
 warnings.filterwarnings("ignore")
 
-# data
-import pickle
-
-# visualize
-import matplotlib.pyplot as plt
-
-# model
-from lightgbm import LGBMRegressor
-
 from engine.features import Features
 from engine.train import *
 
@@ -68,6 +59,7 @@ top_v_opt_x.drop(columns=['상품코드', 'original_c'], inplace=True)
 ####################################################################
 ########################### Light GBM ##############################
 ####################################################################
+
 
 def run_hung_lgbm():
     params_all_opt = params_all_wd.copy()
