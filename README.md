@@ -15,12 +15,12 @@
 ## :open_file_folder: File Summary
 
 ### 1. data 
-   > 데이터 일체
+  데이터 일체
 
 >
 > - 00 : raw data
-  - 01 : raw data에 original_c, small_c, middle_c, big_c 작업 마친 상태
-  - 11 : 외부 변수 생성에 필요한 데이터(날씨, 클릭률 등)
+>  - 01 : raw data에 original_c, small_c, middle_c, big_c 작업 마친 상태
+>  - 11 : 외부 변수 생성에 필요한 데이터(날씨, 클릭률 등)
   - 12 : dummy 변수 생성에 필요한 데이터
   - 13 : 최적화 모델링 및 counterfactual analysis 관련 데이터
   - 20 : preprocess 과정을 거친 데이터
