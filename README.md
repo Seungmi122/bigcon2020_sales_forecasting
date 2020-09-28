@@ -1,6 +1,6 @@
 # :star2: bigcon_2020_mmmz :star2:
 
-## :raising_hand: Contributors
+## :raising_hand: Authors
 - **Seungmin, Seo**  
   Master's degree in Statistics & Data Science, Yonsei University, Seoul, South Korea
 - **Seungmi, Oh**    
@@ -15,7 +15,7 @@
 ## :open_file_folder: File Summary
 
 ### 1. data 
-    > 데이터 일체
+   > 데이터 일체
 
 - 00 : raw data
 - 01 : raw data에 original_c, small_c, middle_c, big_c 작업 마친 상태
