@@ -1,13 +1,13 @@
 # :star2: bigcon_2020_mmmz :star2:
 
 ## :raising_hand: Contributors
-- Seungmin, Seo 
+- Seungmin, Seo  
   Master's degree in Statistics & Data Science, Yonsei University, Seoul, South Korea
-- Seungmi, Oh   
+- Seungmi, Oh    
   Master's degree in Statistics & Data Science, Yonsei University, Seoul, South Korea
-- Sojeong, Ahn  
+- Sojeong, Ahn   
   Bachelor's degree in Korean Literature, Yonsei University, Seoul, South Korea
-- Kyungmin, Cho 
+- Kyungmin, Cho  
   Master's degree in Statistics & Data Science, Yonsei University, Seoul, South Korea
 - Yujin, Jung   
   Master's degree in Statistics & Data Science, Yonsei University, Seoul, South Korea
