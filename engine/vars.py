@@ -1,3 +1,4 @@
+import os
 #####################
 ###### TARGET #######
 #####################
@@ -6,13 +7,13 @@ TARGET = '취급액'
 #####################
 #### DIRECTORIES ####
 #####################
-LOCAL_DIR = ".."
-MODELS_DIR = LOCAL_DIR + "/data/saved_models/"
-FEATURED_DATA_DIR = LOCAL_DIR + '/data/20/'
-SUBMISSION_DIR = LOCAL_DIR + "/submission/"
-OPT_DATA_DIR = LOCAL_DIR + "/data/13/"
-RAW_DATA_DIR = LOCAL_DIR + "/data/00/"
-PLOT_DIR = LOCAL_DIR + "/plot/"
+LOCAL_DIR = "../"
+MODELS_DIR = LOCAL_DIR + "data/saved_models/"
+FEATURED_DATA_DIR = LOCAL_DIR + 'data/20/'
+SUBMISSION_DIR = LOCAL_DIR + "submission/"
+OPT_DATA_DIR = LOCAL_DIR + "data/13/"
+RAW_DATA_DIR = LOCAL_DIR + "data/00/"
+PLOT_DIR = LOCAL_DIR + "plot/"
 
 #####################
 #### GLOBAL VARS ####
