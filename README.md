@@ -1,5 +1,12 @@
 # :star2: bigcon_2020_mmmz :star2:
 
+## :raising_hand: Contributors
+- Seungmin, Seo 
+- Seungmi, Oh
+- Sojeong, Ahn
+- Kyungmin, Cho
+- Yujin, Jung
+
 ## :open_file_folder: File Summary
 
 ### 1. data 
