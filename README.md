@@ -9,7 +9,7 @@
   Bachelor's degree in Korean Literature, Yonsei University, Seoul, South Korea
 - **Kyungmin, Cho**  
   Master's degree in Statistics & Data Science, Yonsei University, Seoul, South Korea
-- **Yujin, Jung**   
+- **Yeojin, Jung**   
   Master's degree in Statistics & Data Science, Yonsei University, Seoul, South Korea
 
 ## :open_file_folder: File Summary
