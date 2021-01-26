@@ -1,4 +1,6 @@
-# :star2: bigcon_2020_mmmz :star2:
+# NS Home-shopping sales forecasting after the Covid-19 outbreak and suggesting optimized TV schedules  
+2nd prize by the Big Data Contest, which is one of the biggest big data contest in South Korea.
+
 
 ## :raising_hand: Authors
 - **Seungmin, Seo**  
@@ -14,8 +16,8 @@
 
 ## :open_file_folder: File Summary
 
-### 1. data 
-  데이터 일체
+### 1. data (생략)
+  데이터 일체 
 
 >  - 00 : raw data
 >  - 01 : raw data에 original_c, small_c, middle_c, big_c 작업 마친 상태
@@ -29,8 +31,6 @@
   eda 파일/클릭률 크롤링/계절성
 
 > - eda.ipynb : eda 과정 일체
-> - naver_shopping_crawling.ipynb : 네이버 쇼핑 트렌드의 클릭률 데이터 crawling
-> - naver_clickr_crawl.R : 클릭률 crawled data 통합
 
 ### 3. engine 
   feature engineering/train/predict/residual analysis /기타 변수 정의
@@ -48,7 +48,7 @@
 > - inputs.py : 헝가리안 최적화 알고리즘을 위한 input 생성
 > - opt_model.py : 헝가리안 최적화 적용 코드
 
-### 5. submission 
+### 5. submission (생략)
 > - submission.xlsx : 2020년 6월 편성표 + predicted y
 
 
