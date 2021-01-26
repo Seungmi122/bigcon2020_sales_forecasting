@@ -1,9 +1,8 @@
 sandbox/
-sandbox
 __pycache__/
 engine/__pycache__/
 opt/__pycache__/
 engine/.ipynb_checkpoints
 */.ipynb_checkpoints/*
 
-eda/.DS_Store
+.DS_Store
